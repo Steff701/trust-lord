@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en-GB" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust Lord - Real Rent. Real Trust. Real Transparency.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'trust-dark': '#0a0a0a',
+                        'trust-gray': '#1a1a1a',
+                        'trust-border': '#2a2a2a',
+                        'trust-accent': '#00d4aa',
+                        'trust-text': '#e5e5e5',
+                        'trust-muted': '#888888'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #00d4aa, #00a085);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 212, 170, 0.1);
+        }
+
+        /* Enhanced Background Styles */
+        .hero-gradient {
+            background: radial-gradient(ellipse at top, rgba(0, 212, 170, 0.1) 0%, transparent 50%),
+            radial-gradient(ellipse at bottom right, rgba(0, 212, 170, 0.05) 0%, transparent 50%),
+            linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
+        }
+
+        .section-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            position: relative;
+        }
+
+        .section-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(0, 212, 170, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(0, 212, 170, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .geometric-bg {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .geometric-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background-image:
+                    radial-gradient(circle at 25% 25%, rgba(0, 212, 170, 0.02) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(0, 212, 170, 0.02) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .mesh-gradient {
+            background:
+                    radial-gradient(at 40% 20%, rgba(0, 212, 170, 0.08) 0px, transparent 50%),
+                    radial-gradient(at 80% 0%, rgba(0, 160, 133, 0.06) 0px, transparent 50%),
+                    radial-gradient(at 0% 50%, rgba(0, 212, 170, 0.04) 0px, transparent 50%),
+                    radial-gradient(at 80% 50%, rgba(0, 160, 133, 0.04) 0px, transparent 50%),
+                    radial-gradient(at 0% 100%, rgba(0, 212, 170, 0.06) 0px, transparent 50%),
+                    radial-gradient(at 80% 100%, rgba(0, 160, 133, 0.08) 0px, transparent 50%),
+                    radial-gradient(at 0% 0%, rgba(0, 212, 170, 0.04) 0px, transparent 50%);
+        }
+
+        .grid-pattern {
+            background-image:
+                    linear-gradient(rgba(0, 212, 170, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 212, 170, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .enhanced-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(15, 15, 15, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 170, 0.1);
+        }
+
+        .enhanced-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.05) 0%, transparent 50%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 170, 0.1) 0%, transparent 70%);
+            animation: float-orb 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-orb {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .nav-blur {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 212, 170, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-trust-dark text-trust-text font-sans antialiased mesh-gradient">
+<!-- Navigation -->
+<nav class="fixed top-0 w-full nav-blur z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-trust-accent rounded-lg flex items-center justify-center">
+                    <span class="text-trust-dark font-bold text-lg">T</span>
+                </div>
+                <span class="text-xl font-semibold">Trust Lord</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#features" class="text-trust-muted hover:text-trust-text transition-colors">Features</a>
+                <a href="#how-it-works" class="text-trust-muted hover:text-trust-text transition-colors">How It Works</a>
+                <a href="#contact" class="text-trust-muted hover:text-trust-text transition-colors">Contact</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 hero-gradient geometric-bg relative">
+    <div class="floating-orb w-64 h-64 top-20 left-10 opacity-30"></div>
+    <div class="floating-orb w-96 h-96 top-40 right-20 opacity-20" style="animation-delay: -5s;"></div>
+    <div class="max-w-7xl mx-auto text-center relative z-10">
+        <div class="fade-in">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                <span class="gradient-text">Real Rent.</span><br>
+                <span class="gradient-text">Real Trust.</span><br>
+                <span class="gradient-text">Real Transparency.</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-trust-muted mb-8 max-w-3xl mx-auto">
+                Blockchain-backed property rental system tailored for East Africa.
+                Immutable lease agreements and transparent rental payments without the complexity.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-trust-accent text-trust-dark px-8 py-4 rounded-lg font-semibold hover:glow transition-all duration-300 transform hover:scale-105">
+                    Get Started
+                </button>
+                <button class="border border-trust-border text-trust-text px-8 py-4 rounded-lg font-semibold hover:border-trust-accent transition-colors">
+                    Learn More
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-20 px-4 sm:px-6 lg:px-8 section-gradient">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16 fade-in">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">Built for East Africa</h2>
+            <p class="text-xl text-trust-muted max-w-2xl mx-auto">
+                Familiar payment methods, local experience, global transparency standards.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="fade-in card-hover enhanced-card relative p-8 rounded-xl">
+                <div class="w-12 h-12 bg-trust-accent/20 rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-trust-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Immutable Records</h3>
+                <p class="text-trust-muted">
+                    Once a lease or payment is recorded, it cannot be altered. Complete transparency for both parties.
+                </p>
+            </div>
+
+            <div class="fade-in card-hover enhanced-card relative p-8 rounded-xl">
+                <div class="w-12 h-12 bg-trust-accent/20 rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-trust-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Mobile Money Integration</h3>
+                <p class="text-trust-muted">
+                    Pay rent through MTN, Airtel, or crypto. Landlords receive UGX directly without complexity.
+                </p>
+            </div>
+
+            <div class="fade-in card-hover enhanced-card relative p-8 rounded-xl">
+                <div class="w-12 h-12 bg-trust-accent/20 rounded-lg flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-trust-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-4">QR Code Simplicity</h3>
+                <p class="text-trust-muted">
+                    Scan a QR code to join a lease. No complex onboarding or technical knowledge required.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-20 px-4 sm:px-6 lg:px-8 grid-pattern relative">
+    <div class="floating-orb w-48 h-48 top-10 right-10 opacity-20" style="animation-delay: -10s;"></div>
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16 fade-in">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">Simple Process</h2>
+            <p class="text-xl text-trust-muted max-w-2xl mx-auto">
+                From lease creation to payment verification in three straightforward steps.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-12">
+            <div class="fade-in text-center">
+                <div class="w-16 h-16 bg-trust-accent rounded-full flex items-center justify-center mx-auto mb-6 text-trust-dark font-bold text-xl">
+                    1
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Create Lease</h3>
+                <p class="text-trust-muted">
+                    Landlord creates a digital lease agreement and generates a QR code for the tenant.
+                </p>
+            </div>
+
+            <div class="fade-in text-center">
+                <div class="w-16 h-16 bg-trust-accent rounded-full flex items-center justify-center mx-auto mb-6 text-trust-dark font-bold text-xl">
+                    2
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Sign & Record</h3>
+                <p class="text-trust-muted">
+                    Tenant scans QR, reviews terms, and signs digitally. Lease is recorded immutably on blockchain.
+                </p>
+            </div>
+
+            <div class="fade-in text-center">
+                <div class="w-16 h-16 bg-trust-accent rounded-full flex items-center justify-center mx-auto mb-6 text-trust-dark font-bold text-xl">
+                    3
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Pay & Verify</h3>
+                <p class="text-trust-muted">
+                    Make payments via mobile money or crypto. Receive tamper-proof receipts instantly.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Target Users Section -->
+<section class="py-20 px-4 sm:px-6 lg:px-8 section-gradient">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div class="fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">For Landlords</h2>
+                <p class="text-xl text-trust-muted mb-8">
+                    Manage properties with confidence. Create verifiable lease agreements,
+                    track payments, and maintain immutable records of all transactions.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-trust-accent rounded-full"></div>
+                        <span>Digital lease creation and management</span>
+                    </li>
+                    <li class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-trust-accent rounded-full"></div>
+                        <span>Automatic payment verification</span>
+                    </li>
+                    <li class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-trust-accent rounded-full"></div>
+                        <span>Tamper-proof record keeping</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">For Tenants</h2>
+                <p class="text-xl text-trust-muted mb-8">
+                    Rent with peace of mind. Get legitimate lease agreements,
+                    make payments through familiar channels, and keep verifiable proof.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-trust-accent rounded-full"></div>
+                        <span>QR code lease onboarding</span>
+                    </li>
+                    <li class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-trust-accent rounded-full"></div>
+                        <span>Mobile money and crypto payments</span>
+                    </li>
+                    <li class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-trust-accent rounded-full"></div>
+                        <span>Immutable payment receipts</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section id="contact" class="py-20 px-4 sm:px-6 lg:px-8 geometric-bg relative">
+    <div class="floating-orb w-72 h-72 top-0 left-1/2 transform -translate-x-1/2 opacity-15"></div>
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="fade-in">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to Transform Rental?</h2>
+            <p class="text-xl text-trust-muted mb-8">
+                Join the future of transparent property rental in East Africa.
+                Built for locals, powered by global technology.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-trust-accent text-trust-dark px-8 py-4 rounded-lg font-semibold hover:glow transition-all duration-300 transform hover:scale-105">
+                    Download App
+                </button>
+                <button class="border border-trust-border text-trust-text px-8 py-4 rounded-lg font-semibold hover:border-trust-accent transition-colors">
+                    Contact Us
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-trust-border">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                <div class="w-8 h-8 bg-trust-accent rounded-lg flex items-center justify-center">
+                    <span class="text-trust-dark font-bold text-lg">T</span>
+                </div>
+                <span class="text-xl font-semibold">Trust Lord</span>
+            </div>
+            <p class="text-trust-muted text-center md:text-right">
+                Built with ♥ for Kampala, by a team that believes every tenant deserves dignity<br>
+                and every landlord deserves clarity.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Intersection Observer for fade-in animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all fade-in elements
+    document.addEventListener('DOMContentLoaded', () => {
+        const fadeElements = document.querySelectorAll('.fade-in');
+        fadeElements.forEach(el => observer.observe(el));
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
