@@ -40,6 +40,13 @@ export default function TenantLayout() {
           title: 'Support'
         }}
       />
+      <Stack.Screen
+        name="view-document"
+        options={{
+          title: 'Lease Document',
+          presentation: 'modal'
+        }}
+      />
     </Stack>
   );
 }

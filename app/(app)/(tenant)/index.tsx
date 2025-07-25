@@ -35,6 +35,7 @@ import {
   MapPin, Badge, QrCode
 } from '@tamagui/lucide-icons';
 import { router } from 'expo-router';
+import { localApi } from 'services/localApi';
 
 interface LeaseData {
   propertyName: string;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User as AppUser, UserProfile, UserRole } from 'types/user';
+import { localApi } from './localApi';
 
 interface AuthContextType {
   user: AppUser | null;
@@ -26,8 +27,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AppUser | null>(null);
 
   useEffect(() => {
-    // Initially, no user is signed in
-    setLoading(false);
+    const loadUser = async () => {
+      try {
+        const storedUser = await localApi.getUser();
+        if (storedUser) {
+          // Convert date strings back to Date objects if necessary
+          storedUser.createdAt = new Date(storedUser.createdAt);
+          storedUser.updatedAt = new Date(storedUser.updatedAt);
+          if (storedUser.lastLoginAt) storedUser.lastLoginAt = new Date(storedUser.lastLoginAt);
+          setUser(storedUser);
+        }
+      } catch (error) {
+        console.error("Failed to load user from AsyncStorage:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUser();
   }, []);
 
   const signIn = async (role: UserRole, profileData: Partial<UserProfile> & { phoneNumber: string; email?: string }) => {
@@ -81,6 +97,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     setUser(newUser);
+    await localApi.saveUser(newUser); // Save user to AsyncStorage
     setLoading(false);
   };
 

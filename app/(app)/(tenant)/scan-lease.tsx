@@ -27,6 +27,8 @@ import {
   Edit3
 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
+import { localApi } from 'services/localApi';
+import { bitnobService } from 'services/bitnob';
 
 interface QRLeaseData {
   leaseId: string;
@@ -511,19 +513,73 @@ const ScanLeaseScreen: React.FC = () => {
   const handlePaymentMethodSelection = async (method: 'mobile_money' | 'crypto') => {
     setState(prev => ({ ...prev, isSubmitting: true, showPaymentMethodSelection: false }));
 
-    // Simulate lease acceptance and payment initiation
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (!state.parsedLeaseData) {
+      Alert.alert('Error', 'Lease data not available.');
+      setState(prev => ({ ...prev, isSubmitting: false }));
+      return;
+    }
 
-    Alert.alert(
-      'Lease Accepted & Payment Initiated',
-      `Your lease agreement has been created successfully! Proceeding with ${method} payment.`,
-      [{ text: 'OK', onPress: () => {
-        router.replace({
-          pathname: '/(app)/(tenant)/payments',
-          params: { paymentMethod: method, leaseId: state.parsedLeaseData?.leaseId }
+    const leaseDataToSave = {
+      lease: {
+        ...state.parsedLeaseData,
+        leaseStartDate: state.parsedLeaseData.leaseStartDate,
+        leaseEndDate: new Date(new Date(state.parsedLeaseData.leaseStartDate).setMonth(new Date(state.parsedLeaseData.leaseStartDate).getMonth() + state.parsedLeaseData.leaseDuration)).toISOString().split('T')[0],
+      },
+      paymentStatus: {
+        lastPaymentDate: null,
+        lastPaymentAmount: 0,
+        nextDueDate: new Date(state.parsedLeaseData.leaseStartDate).toISOString().split('T')[0],
+        paymentStatus: 'due',
+        daysUntilDue: 0,
+      },
+    };
+
+    if (method === 'crypto') {
+      try {
+        const bitnobResponse = await bitnobService.initiatePayment({
+          amount: state.parsedLeaseData.monthlyRent,
+          currency: state.parsedLeaseData.currency as 'UGX',
+          cryptoCurrency: 'BTC', // Assuming BTC for now, could be dynamic
+          customerEmail: 'tenant@example.com', // Mock email
+          customerPhone: state.parsedLeaseData.landlordPhone, // Using landlord phone as mock tenant phone
+          reference: `lease_${state.parsedLeaseData.leaseId}_${Date.now()}`,
+          description: `Rent payment for ${state.parsedLeaseData.propertyName}`,
         });
-      } }]
-    );
+
+        if (bitnobResponse.success) {
+          await localApi.saveTenantLease(leaseDataToSave);
+          Alert.alert(
+            'Lease Accepted & Payment Initiated',
+            `Your lease agreement has been created successfully! Proceeding with crypto payment. Payment ID: ${bitnobResponse.data?.paymentId}`,
+            [{ text: 'OK', onPress: () => {
+              router.replace({
+                pathname: '/(app)/(tenant)/payments',
+                params: { paymentMethod: method, leaseId: state.parsedLeaseData?.leaseId, bitnobPaymentId: bitnobResponse.data?.paymentId }
+              });
+            } }]
+          );
+        } else {
+          Alert.alert('Payment Initiation Failed', bitnobResponse.error?.message || 'An unknown error occurred.');
+        }
+      } catch (error) {
+        console.error('Error initiating Bitnob payment:', error);
+        Alert.alert('Payment Error', 'Failed to initiate crypto payment. Please try again.');
+      }
+    } else if (method === 'mobile_money') {
+      // Simulate mobile money payment initiation
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      await localApi.saveTenantLease(leaseDataToSave);
+      Alert.alert(
+        'Lease Accepted & Payment Initiated',
+        `Your lease agreement has been created successfully! Proceeding with mobile money payment.`,
+        [{ text: 'OK', onPress: () => {
+          router.replace({
+            pathname: '/(app)/(tenant)/payments',
+            params: { paymentMethod: method, leaseId: state.parsedLeaseData?.leaseId }
+          });
+        } }]
+      );
+    }
     setState(prev => ({ ...prev, isSubmitting: false }));
   };
 
