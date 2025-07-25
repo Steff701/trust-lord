@@ -32,8 +32,9 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  MapPin, Badge,
+  MapPin, Badge, QrCode
 } from '@tamagui/lucide-icons';
+import { router } from 'expo-router';
 
 interface LeaseData {
   propertyName: string;
@@ -371,7 +372,7 @@ const TenantHomeScreen: React.FC = () => {
         }
         break;
       case 'payment-history':
-        console.log('Navigate to payment history');
+        router.push('/(app)/(tenant)/payments');
         break;
       case 'view-lease':
         console.log('Navigate to lease document');
@@ -421,10 +422,19 @@ const TenantHomeScreen: React.FC = () => {
         {/* Header */}
         <XStack style={styles.headerContainer}>
           <H1 style={styles.headerText}>My Lease</H1>
-          <Button
-            style={styles.bellButton}
-            icon={<Bell size={20} color="#6B7280" />}
-          />
+          <XStack gap="$2">
+            <Button
+              style={styles.bellButton}
+              icon={<Bell size={20} color="#6B7280" />}
+            />
+            <Button
+              style={styles.scanLeaseButton}
+              onPress={() => router.push('/(app)/(tenant)/scan-lease')}
+              icon={<QrCode size={20} color="#3B82F6" />}
+            >
+              <Text style={styles.scanLeaseButtonText}>Scan Lease</Text>
+            </Button>
+          </XStack>
         </XStack>
 
         <AlertBanner paymentStatus={tenantData.paymentStatus} />
@@ -471,6 +481,20 @@ const styles = StyleSheet.create({
     borderColor: '#CBD5E0',
     borderRadius: 9999,
     padding: 8,
+  },
+  scanLeaseButton: {
+    backgroundColor: '#3B82F6',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  scanLeaseButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   alertCard: {
     padding: 12,

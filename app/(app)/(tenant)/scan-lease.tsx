@@ -26,6 +26,7 @@ import {
   CheckCircle,
   Edit3
 } from '@tamagui/lucide-icons';
+import { useRouter } from 'expo-router';
 
 interface QRLeaseData {
   leaseId: string;
@@ -66,6 +67,7 @@ interface ScanLeaseState {
   isSubmitting: boolean;
   showManualEntry: boolean;
   manualCode: string;
+  showPaymentMethodSelection: boolean;
 }
 
 const { width, height } = Dimensions.get('window');
@@ -306,7 +308,7 @@ const LeasePreviewCard: React.FC<{
             disabled={!termsAccepted || isLoading}
           >
             <Text style={styles.acceptButtonText}>
-              {isLoading ? 'Processing...' : 'Accept Lease'}
+              {isLoading ? 'Processing...' : 'Proceed to Payment'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -364,7 +366,48 @@ const ManualEntryModal: React.FC<{
   );
 };
 
+const PaymentMethodSelectionModal: React.FC<{
+  visible: boolean;
+  onClose: () => void;
+  onSelectMethod: (method: 'mobile_money' | 'crypto') => void;
+}> = ({ visible, onClose, onSelectMethod }) => {
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <TouchableOpacity onPress={onClose}>
+            <X size={24} color="#000000" />
+          </TouchableOpacity>
+          <Text style={styles.modalTitle}>Select Payment Method</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        <View style={styles.modalContent}>
+          <Text style={styles.modalDescription}>
+            Choose how you'd like to make your first rent payment.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.paymentMethodButton}
+            onPress={() => onSelectMethod('mobile_money')}
+          >
+            <Text style={styles.paymentMethodButtonText}>Mobile Money (MTN, Airtel)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.paymentMethodButton}
+            onPress={() => onSelectMethod('crypto')}
+          >
+            <Text style={styles.paymentMethodButtonText}>Crypto (Bitnob)</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
 const ScanLeaseScreen: React.FC = () => {
+  const router = useRouter();
   const [state, setState] = useState<ScanLeaseState>({
     hasPermission: null,
     isScanning: true,
@@ -462,17 +505,26 @@ const ScanLeaseScreen: React.FC = () => {
   };
 
   const handleLeaseAccept = async () => {
-    setState(prev => ({ ...prev, isSubmitting: true }));
+    setState(prev => ({ ...prev, showPaymentMethodSelection: true }));
+  };
 
-    // Mock Firebase integration
-    setTimeout(() => {
-      Alert.alert(
-        'Lease Accepted',
-        'Your lease agreement has been created successfully!',
-        [{ text: 'OK', onPress: () => console.log('Navigate to dashboard') }]
-      );
-      setState(prev => ({ ...prev, isSubmitting: false }));
-    }, 2000);
+  const handlePaymentMethodSelection = async (method: 'mobile_money' | 'crypto') => {
+    setState(prev => ({ ...prev, isSubmitting: true, showPaymentMethodSelection: false }));
+
+    // Simulate lease acceptance and payment initiation
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    Alert.alert(
+      'Lease Accepted & Payment Initiated',
+      `Your lease agreement has been created successfully! Proceeding with ${method} payment.`,
+      [{ text: 'OK', onPress: () => {
+        router.replace({
+          pathname: '/(app)/(tenant)/payments',
+          params: { paymentMethod: method, leaseId: state.parsedLeaseData?.leaseId }
+        });
+      } }]
+    );
+    setState(prev => ({ ...prev, isSubmitting: false }));
   };
 
   const handleLeaseReject = () => {
@@ -549,11 +601,11 @@ const ScanLeaseScreen: React.FC = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log('Close')}>
+        <TouchableOpacity onPress={() => router.back()}>
           {state.showPreview ? (
-            <ArrowLeft size={24} color="#333" />
+            <ArrowLeft size={24} color="#e5e5e5" />
           ) : (
-            <X size={24} color="#333" />
+            <X size={24} color="#e5e5e5" />
           )}
         </TouchableOpacity>
 
@@ -563,7 +615,7 @@ const ScanLeaseScreen: React.FC = () => {
 
         {!state.showPreview && (
           <TouchableOpacity onPress={toggleFlash}>
-            <Flashlight size={24} color={state.isFlashOn ? '#2E7D32' : '#666'} />
+            <Flashlight size={24} color={state.isFlashOn ? '#00d4aa' : '#e5e5e5'} />
           </TouchableOpacity>
         )}
 
@@ -616,7 +668,7 @@ const ScanLeaseScreen: React.FC = () => {
                   error: null
                 }))}
               >
-                <Edit3 size={20} color="#2E7D32" />
+                <Edit3 size={20} color="#00d4aa" />
                 <Text style={styles.manualEntryText}>Enter Code Manually</Text>
               </TouchableOpacity>
             </>
@@ -631,6 +683,12 @@ const ScanLeaseScreen: React.FC = () => {
         code={state.manualCode}
         onCodeChange={(code) => setState(prev => ({ ...prev, manualCode: code }))}
       />
+
+      <PaymentMethodSelectionModal
+        visible={state.showPaymentMethodSelection}
+        onClose={() => setState(prev => ({ ...prev, showPaymentMethodSelection: false }))}
+        onSelectMethod={handlePaymentMethodSelection}
+      />
     </View>
   );
 };
@@ -638,7 +696,7 @@ const ScanLeaseScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5', // Light background
   },
   header: {
     flexDirection: 'row',
@@ -648,12 +706,12 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#CBD5E0', // Light border
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000', // Dark text
   },
   scannerWrapper: {
     flex: 1,
@@ -669,20 +727,21 @@ const styles = StyleSheet.create({
   mockCamera: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF', // Light background
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: '#CBD5E0', // Light border
   },
   mockCameraText: {
     fontSize: 48,
     marginBottom: 10,
+    color: '#000000', // Dark text
   },
   mockCameraSubtext: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280', // Muted text
     textAlign: 'center',
   },
   scanningGuides: {
@@ -696,7 +755,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 30,
     height: 30,
-    borderColor: '#2E7D32',
+    borderColor: '#F6AD55', // Accent color
     borderWidth: 3,
   },
   topLeft: {
@@ -728,12 +787,12 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     height: 2,
-    backgroundColor: '#2E7D32',
+    backgroundColor: '#F6AD55', // Accent color
     top: 20,
   },
   instructionText: {
     fontSize: 16,
-    color: '#666',
+    color: '#6B7280', // Muted text
     textAlign: 'center',
     marginTop: 30,
     marginBottom: 20,
@@ -742,15 +801,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#FFFFFF', // Light background
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#2E7D32',
+    borderColor: '#CBD5E0', // Light border
     marginTop: 20,
   },
   manualEntryText: {
     fontSize: 16,
-    color: '#2E7D32',
+    color: '#3B82F6', // Info color
     marginLeft: 8,
     fontWeight: '500',
   },
@@ -758,6 +817,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F5F5F5', // Light background
   },
   loadingOverlay: {
     justifyContent: 'center',
@@ -765,61 +825,65 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: '#6B7280', // Muted text
     marginTop: 20,
   },
   permissionContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F5F5F5', // Light background
     padding: 40,
   },
   permissionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000', // Dark text
     marginTop: 20,
     marginBottom: 12,
   },
   permissionText: {
     fontSize: 16,
-    color: '#666',
+    color: '#6B7280', // Muted text
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 30,
   },
   settingsButton: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: '#F6AD55', // Accent color
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   settingsButtonText: {
-    color: '#fff',
+    color: '#FFFFFF', // Light text
     fontSize: 16,
     fontWeight: '500',
   },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffebee',
+    backgroundColor: '#FFF1F0', // Light error background
     padding: 12,
     borderRadius: 8,
     marginTop: 20,
     marginHorizontal: 20,
+    borderColor: '#EF4444', // Error color
+    borderWidth: 1,
   },
   errorText: {
     fontSize: 14,
-    color: '#c62828',
+    color: '#EF4444', // Error color
     marginLeft: 8,
     flex: 1,
   },
   previewContainer: {
     flex: 1,
+    backgroundColor: '#F5F5F5', // Light background
   },
   previewCard: {
     margin: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF', // Light background
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -827,6 +891,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderColor: '#CBD5E0', // Light border
+    borderWidth: 1,
   },
   propertyHeader: {
     flexDirection: 'row',
@@ -840,11 +906,11 @@ const styles = StyleSheet.create({
   propertyName: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000', // Dark text
   },
   unitNumber: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280', // Muted text
     marginTop: 2,
   },
   detailRow: {
@@ -854,7 +920,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 16,
-    color: '#666',
+    color: '#000000', // Dark text
     marginLeft: 12,
     flex: 1,
     lineHeight: 22,
@@ -862,14 +928,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000', // Dark text
     marginBottom: 12,
   },
   financialSection: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#F8F9FA', // Light background
     padding: 16,
     borderRadius: 8,
     marginBottom: 20,
+    borderColor: '#E5E7EB', // Light border
+    borderWidth: 1,
   },
   financialRow: {
     flexDirection: 'row',
@@ -879,28 +947,28 @@ const styles = StyleSheet.create({
   },
   financialLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280', // Muted text
   },
   financialAmount: {
     fontSize: 14,
-    color: '#333',
+    color: '#000000', // Dark text
     fontWeight: '500',
   },
   totalRow: {
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#E5E7EB', // Light border
     paddingTop: 8,
     marginTop: 8,
   },
   totalLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000', // Dark text
   },
   totalAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2E7D32',
+    color: '#3B82F6', // Info color
   },
   termsSection: {
     marginBottom: 20,
@@ -916,11 +984,11 @@ const styles = StyleSheet.create({
   },
   termLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280', // Muted text
   },
   termValue: {
     fontSize: 16,
-    color: '#333',
+    color: '#000000', // Dark text
     fontWeight: '500',
     marginTop: 2,
   },
@@ -933,7 +1001,7 @@ const styles = StyleSheet.create({
   landlordName: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: '#000000', // Dark text
   },
   phoneRow: {
     flexDirection: 'row',
@@ -941,7 +1009,7 @@ const styles = StyleSheet.create({
   },
   phoneNumber: {
     fontSize: 16,
-    color: '#2E7D32',
+    color: '#3B82F6', // Info color
     marginLeft: 8,
     fontWeight: '500',
   },
@@ -950,14 +1018,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 24,
     padding: 12,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#F8F9FA', // Light background
     borderRadius: 8,
+    borderColor: '#E5E7EB', // Light border
+    borderWidth: 1,
   },
   checkbox: {
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: '#ccc',
+    borderColor: '#CBD5E0', // Light border
     borderRadius: 4,
     marginRight: 12,
     justifyContent: 'center',
@@ -965,12 +1035,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   checkboxChecked: {
-    backgroundColor: '#2E7D32',
-    borderColor: '#2E7D32',
+    backgroundColor: '#F6AD55', // Accent color
+    borderColor: '#F6AD55', // Accent color
   },
   termsText: {
     fontSize: 14,
-    color: '#666',
+    color: '#000000', // Dark text
     flex: 1,
     lineHeight: 20,
   },
@@ -980,36 +1050,36 @@ const styles = StyleSheet.create({
   },
   rejectButton: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF', // Light background
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#CBD5E0', // Light border
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   rejectButtonText: {
     fontSize: 16,
-    color: '#666',
+    color: '#6B7280', // Muted text
     fontWeight: '500',
   },
   acceptButton: {
     flex: 1,
-    backgroundColor: '#2E7D32',
+    backgroundColor: '#F6AD55', // Accent color
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   acceptButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#E5E7EB', // Light disabled background
   },
   acceptButtonText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#FFFFFF', // Light text
     fontWeight: '600',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5', // Light background
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1019,12 +1089,12 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#CBD5E0', // Light border
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000', // Dark text
   },
   modalContent: {
     flex: 1,
@@ -1032,32 +1102,46 @@ const styles = StyleSheet.create({
   },
   modalDescription: {
     fontSize: 16,
-    color: '#666',
+    color: '#6B7280', // Muted text
     lineHeight: 24,
     marginBottom: 24,
   },
   codeInput: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#CBD5E0', // Light border
     borderRadius: 8,
     padding: 16,
     fontSize: 16,
     textAlignVertical: 'top',
     marginBottom: 24,
     minHeight: 120,
+    color: '#000000', // Dark text
+    backgroundColor: '#FFFFFF', // Light background
   },
   submitButton: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: '#F6AD55', // Accent color
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   submitButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#E5E7EB', // Light disabled background
   },
   submitButtonText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#FFFFFF', // Light text
+    fontWeight: '600',
+  },
+  paymentMethodButton: {
+    backgroundColor: '#F6AD55',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  paymentMethodButtonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
     fontWeight: '600',
   },
 });
