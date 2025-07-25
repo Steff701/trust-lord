@@ -17,6 +17,20 @@ export default function AuthLayout() {
           headerBackTitle: 'Back'
         }}
       />
+      <Stack.Screen
+        name="verify-otp"
+        options={{
+          title: 'Verify OTP',
+          headerBackTitle: 'Back'
+        }}
+      />
+      <Stack.Screen
+        name="setup-account"
+        options={{
+          title: 'Setup Account',
+          headerBackTitle: 'Back'
+        }}
+      />
     </Stack>
   );
 }

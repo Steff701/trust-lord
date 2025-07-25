@@ -18,6 +18,7 @@ export default function TenantLayout() {
         name="index"
         options={{
           title: 'My Lease',
+          headerShown: false,
         }}
       />
       <Stack.Screen
