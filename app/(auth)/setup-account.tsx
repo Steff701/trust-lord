@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, Alert, ScrollView } from 'react-native';
 import { YStack, Input, Button, Text, Spinner } from 'tamagui';
-import { useLocalSearchParams } from 'expo-router';
+import {router, useLocalSearchParams} from 'expo-router';
 import { useAuth } from 'services/auth';
 
 const Colors = {
@@ -62,6 +62,7 @@ export default function SetupAccountScreen() {
         idType: role === 'landlord' ? 'national_id' : undefined,
       };
       await signIn(role as 'tenant' | 'landlord', userProfile);
+      router.replace('/'); // Navigate to the root, which will then redirect based on auth state
     } catch (error) {
       Alert.alert('Account Setup Failed', 'An error occurred during account setup.');
     }

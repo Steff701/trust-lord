@@ -13,7 +13,7 @@ export default function Index() {
     return <Redirect href="/(auth)/onboarding"/>;
   }
 
-  const userRole = user.role; // This will come from your user data
+  const userRole = user.roles[0]; // Get the primary role from the roles array
 
   useEffect(() => {
     console.log('user role', userRole);
