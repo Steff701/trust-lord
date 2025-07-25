@@ -1,10 +1,10 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User as AppUser } from 'types';
+import { User as AppUser, UserProfile, UserRole } from 'types/user';
 
 interface AuthContextType {
   user: AppUser | null;
   loading: boolean;
-  signIn: (role: 'tenant' | 'landlord', profileData: any) => Promise<void>;
+  signIn: (role: UserRole, profileData: Partial<UserProfile> & { phoneNumber: string; email?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -30,17 +30,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(false);
   }, []);
 
-  const signIn = async (role: 'tenant' | 'landlord', profileData: any) => {
+  const signIn = async (role: UserRole, profileData: Partial<UserProfile> & { phoneNumber: string; email?: string }) => {
     setLoading(true);
     // Simulate sign-in process
     await new Promise(resolve => setTimeout(resolve, 500));
 
+    const userProfile: UserProfile = {
+      firstName: profileData.firstName || '',
+      lastName: profileData.lastName || '',
+      email: profileData.email || undefined,
+      idNumber: profileData.idNumber || undefined,
+      idType: profileData.idType || undefined,
+    };
+
     const newUser: AppUser = {
       uid: `mock-${role}-id-${Date.now()}`,
-      email: profileData.email || '',
+      email: profileData.email || undefined,
       phoneNumber: profileData.phoneNumber,
-      displayName: `${profileData.firstName} ${profileData.lastName}`,
-      photoURL: '',
+      displayName: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim(),
+      photoURL: undefined,
       emailVerified: false,
       phoneVerified: true,
       identityVerified: role === 'landlord' && !!profileData.idNumber,
@@ -51,18 +59,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
       preferences: {
         language: 'en',
         currency: 'UGX',
-        notifications: {},
+        notifications: {
+          email: true,
+          sms: true,
+          push: true,
+          whatsapp: true,
+          paymentReminders: true,
+          leaseUpdates: true,
+          propertyUpdates: true,
+          marketing: false,
+        },
         preferredPaymentMethods: [],
         timezone: 'Africa/Kampala',
         theme: 'light',
       },
-      contactMethods: [],
-      profile: {
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
-        idNumber: profileData.idNumber || undefined,
-        idType: profileData.idType || undefined,
-      },
+      contactMethods: [
+        { type: 'phone', value: profileData.phoneNumber, isPrimary: true, isVerified: true, country: 'UG' },
+        ...(profileData.email ? [{ type: 'email', value: profileData.email, isPrimary: false, isVerified: false, country: 'UG' }] : []),
+      ],
+      profile: userProfile,
     };
 
     setUser(newUser);

@@ -4,6 +4,19 @@ import { YStack, Input, Button, Text, Spinner } from 'tamagui';
 import {router, useLocalSearchParams} from 'expo-router';
 import { useAuth } from 'services/auth';
 
+const Colors = {
+  primaryBackground: '#F5F5F5',
+  cardBackground: '#FFFFFF',
+  primaryText: '#000000',
+  secondaryText: '#6B7280',
+  borderColor: '#CBD5E0',
+  accentColor: '#F6AD55',
+  accentDark: '#E0A040',
+  infoColor: '#3B82F6',
+  successColor: '#22C55E',
+  errorColor: '#EF4444',
+};
+
 export default function VerifyOtpScreen() {
   const { phoneNumber, role } = useLocalSearchParams();
   const { signIn } = useAuth();
@@ -58,7 +71,7 @@ export default function VerifyOtpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: Colors.primaryBackground,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -66,7 +79,7 @@ const styles = StyleSheet.create({
     width: '80%',
     maxWidth: 400,
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.cardBackground,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -80,24 +93,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-    color: '#000000',
+    color: Colors.primaryText,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: Colors.secondaryText,
     textAlign: 'center',
     marginBottom: 20,
   },
   input: {
-    borderColor: '#CBD5E0',
+    borderColor: Colors.borderColor,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     height: 50,
-    color: '#000000',
+    color: Colors.primaryText,
   },
   button: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: Colors.accentColor,
     borderRadius: 8,
     height: 50,
     justifyContent: 'center',
