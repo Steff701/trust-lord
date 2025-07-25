@@ -8,13 +8,17 @@ import { bitnobService } from 'services/bitnob';
 
 export default function PaymentsScreen() {
   const router = useRouter();
-  const { paymentMethod, leaseId, bitnobPaymentId } = useLocalSearchParams();
+  const { paymentMethod, leaseId, bitnobPaymentId, cryptoAddress, cryptoAmount } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<'processing' | 'success' | 'failed'>('processing');
+  const [paymentInitiated, setPaymentInitiated] = useState(false); // New state for crypto payment flow
 
   useEffect(() => {
     const processPayment = async () => {
       setLoading(true);
+
+      // Add a consistent delay for all payment processing
+      await new Promise(resolve => setTimeout(resolve, 3000)); // 3-second delay
 
       if (paymentMethod === 'crypto' && bitnobPaymentId) {
         // Handle crypto payment via Bitnob simulation
@@ -66,7 +70,6 @@ export default function PaymentsScreen() {
         }
       } else if (paymentMethod) {
         // Handle other payment methods (e.g., mobile_money) with mock logic
-        await new Promise(resolve => setTimeout(resolve, 3000));
         const success = Math.random() > 0.2; // 80% success rate
 
         if (success) {
@@ -120,6 +123,11 @@ export default function PaymentsScreen() {
     };
 
     if (paymentMethod && leaseId) {
+      if (paymentMethod === 'crypto' && !paymentInitiated) {
+        // For crypto, wait for user to confirm sending crypto
+        setLoading(false);
+        return;
+      }
       processPayment();
     } else {
       setLoading(false);
@@ -131,7 +139,11 @@ export default function PaymentsScreen() {
         ]
       );
     }
-  }, [paymentMethod, leaseId, bitnobPaymentId]);
+  }, [paymentMethod, leaseId, bitnobPaymentId, paymentInitiated]);
+
+  const handleCryptoPaymentConfirmation = () => {
+    setPaymentInitiated(true);
+  };
 
   const getIcon = () => {
     if (loading || paymentStatus === 'processing') {
@@ -155,19 +167,39 @@ export default function PaymentsScreen() {
 
   return (
     <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="#F5F5F5" padding="$4">
-      {getIcon()}
-      <H3 textAlign="center" marginTop="$4" color="#000000">
-        {getMessage()}
-      </H3>
-      {paymentStatus === 'failed' && (
-        <Button onPress={() => router.back()} marginTop="$4" backgroundColor="#F6AD55">
-          <Text color="#FFFFFF">Try Again</Text>
-        </Button>
-      )}
-      {(loading || paymentStatus === 'processing') && (
-        <Paragraph textAlign="center" marginTop="$2" color="#6B7280">
-          Please do not close the app.
-        </Paragraph>
+      {paymentMethod === 'crypto' && !paymentInitiated ? (
+        <YStack alignItems="center" space="$4">
+          <H3 textAlign="center" color="#000000">Send Crypto Payment</H3>
+          <Paragraph textAlign="center" color="#6B7280">
+            Please send <Text fontWeight="bold">{cryptoAmount} BTC</Text> to the following address:
+          </Paragraph>
+          <Text selectable={true} fontSize="$5" fontWeight="bold" color="#3B82F6" textAlign="center">
+            {cryptoAddress}
+          </Text>
+          <Paragraph textAlign="center" color="#6B7280">
+            Once you have sent the crypto from your external wallet, tap the button below.
+          </Paragraph>
+          <Button onPress={handleCryptoPaymentConfirmation} marginTop="$4" backgroundColor="#F6AD55">
+            <Text color="#FFFFFF">I have sent the crypto</Text>
+          </Button>
+        </YStack>
+      ) : (
+        <>
+          {getIcon()}
+          <H3 textAlign="center" marginTop="$4" color="#000000">
+            {getMessage()}
+          </H3>
+          {paymentStatus === 'failed' && (
+            <Button onPress={() => router.back()} marginTop="$4" backgroundColor="#F6AD55">
+              <Text color="#FFFFFF">Try Again</Text>
+            </Button>
+          )}
+          {(loading || paymentStatus === 'processing') && (
+            <Paragraph textAlign="center" marginTop="$2" color="#6B7280">
+              Please do not close the app.
+            </Paragraph>
+          )}
+        </>
       )}
     </YStack>
   );

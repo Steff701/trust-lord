@@ -554,7 +554,7 @@ const ScanLeaseScreen: React.FC = () => {
             [{ text: 'OK', onPress: () => {
               router.replace({
                 pathname: '/(app)/(tenant)/payments',
-                params: { paymentMethod: method, leaseId: state.parsedLeaseData?.leaseId, bitnobPaymentId: bitnobResponse.data?.paymentId }
+                params: { paymentMethod: method, leaseId: state.parsedLeaseData?.leaseId, bitnobPaymentId: bitnobResponse.data?.paymentId, cryptoAddress: bitnobResponse.data?.walletAddress, cryptoAmount: bitnobResponse.data?.cryptoAmount }
               });
             } }]
           );
