@@ -19,6 +19,7 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -33,6 +34,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
       [
         "expo-build-properties",
         {
@@ -51,6 +54,9 @@
     },
     "extra": {
       "router": {},
+      "eas": {
+        "projectId": "07c8e6fe-8abb-4e2c-8c3e-6f589d19e478"
+      }
     }
   }
 }

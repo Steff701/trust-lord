@@ -3988,6 +3988,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/firestore@npm:^22.4.0":
+  version: 22.4.0
+  resolution: "@react-native-firebase/firestore@npm:22.4.0"
+  dependencies:
+    react-native-url-polyfill: "npm:2.0.0"
+  peerDependencies:
+    "@react-native-firebase/app": 22.4.0
+  checksum: 10/105c708963639bda4fd4fd4effe1fc7f3ff433a652daa85d7ce840a92cb5905667f7cd8735d16d8269c7be7e0825b78b99b6c9be4f250130970996b9364e42c4
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.75.2":
   version: 0.75.2
   resolution: "@react-native/assets-registry@npm:0.75.2"
@@ -12678,6 +12689,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-url-polyfill@npm:2.0.0":
+  version: 2.0.0
+  resolution: "react-native-url-polyfill@npm:2.0.0"
+  dependencies:
+    whatwg-url-without-unicode: "npm:8.0.0-3"
+  peerDependencies:
+    react-native: "*"
+  checksum: 10/6a8d605eeb1b0ee9b0f47f1866acc2edfa2131a4a8fb1ea3839ceb507e225b894ed66f49a3bd826fc964f2c8005b3678c9d3b65d07eb0a3b979be830cb618686
+  languageName: node
+  linkType: hard
+
 "react-native-web@npm:^0.20.0":
   version: 0.20.0
   resolution: "react-native-web@npm:0.20.0"
@@ -14157,6 +14179,7 @@ __metadata:
     "@react-native-async-storage/async-storage": "npm:^2.2.0"
     "@react-native-firebase/app": "npm:^22.4.0"
     "@react-native-firebase/auth": "npm:^22.4.0"
+    "@react-native-firebase/firestore": "npm:^22.4.0"
     "@react-navigation/native": "npm:^7.1.6"
     "@tamagui/babel-plugin": "npm:^1.132.11"
     "@tamagui/cli": "npm:^1.132.11"
