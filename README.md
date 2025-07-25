@@ -82,8 +82,8 @@ trustlord/
 │   ├── PropertyCard.tsx
 │   ├── LeaseSummaryCard.tsx
 │   └── AuthGuard.tsx
-├── lib/
-│   ├── firebase.ts
+├── services/
+│   ├── bitnob.ts
 │   ├── auth.ts
 │   └── types.ts
 ├── constants/
